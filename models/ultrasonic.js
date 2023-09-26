@@ -14,4 +14,4 @@ module.exports = mongoose.model('Ultrasonic Sensor', new mongoose.Schema({
             },
         }
     ]
-}, { collection: 'gps-data' }));
+}, { collection: 'Ultrasonic' }));

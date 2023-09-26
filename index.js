@@ -19,7 +19,7 @@ parser.on('data', async (data) => {
 
     const array_data = data.split(" ");
 
-    // 1 10:58:46 14:9:2023 3750.6430S 14506.7968E 107.90 5
+    // 1 10:58:46 14:9:2023 10.5
 
     const sensor_id = array_data[0];
     const time = array_data[1];
