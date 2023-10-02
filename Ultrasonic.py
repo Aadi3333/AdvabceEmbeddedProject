@@ -1,6 +1,13 @@
 #Libraries
+import pymongo
 import RPi.GPIO as GPIO
 import time
+from datetime import datetime  # Import the datetime module
+
+connection_string = f"mongodb+srv://aadi333:Aadimahala70154@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
+client = pymongo.MongoClient(connection_string)
+db = client["mydatabase"]
+col = db["mycollection"]
  
 #GPIO Mode (BOARD / BCM)
 GPIO.setmode(GPIO.BCM)
@@ -45,10 +52,31 @@ if __name__ == '__main__':
         while True:
             dist = distance()
             print("Measured Distance = %.1f cm" % dist)
+            current_time = datetime.now()
+            device_id = "1"  # Replace with your device ID
+            
+            # Create a data entry
+            data_entry = {"distance": dist, "timestamp": current_time}
+            
+            # Check if a document with the device ID exists
+            existing_data = col.find_one({"_id": device_id})
+            
+            if existing_data:
+                # If the document exists, append the new data entry to an array
+                col.update_one({"_id": device_id}, {"$push": {"data": data_entry}})
+            else:
+                # If the document doesn't exist, create a new one with an array of data entries
+                sensor_data = {"_id": device_id, "data": [data_entry]}
+                col.insert_one(sensor_data)
+
             time.sleep(1)
- 
+
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
         GPIO.cleanup()
+
+
+
+
 
