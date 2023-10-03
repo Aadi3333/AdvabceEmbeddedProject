@@ -9,12 +9,12 @@ import RPi.GPIO as GPIO
 import time
 
 # MongoDB connection URI
-mongo_uri = f"mongodb+srv://username:password@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
+mongo_uri = "mongodb+srv://username:password@cluster0.example.com/?retryWrites=true&w=majority"
 
 # Connect to MongoDB
 client = pymongo.MongoClient(mongo_uri)
-db = client["AdvanceParking"]
-collection = db["database"]
+db = client["AdvanceParking"]  # Replace with your database name
+collection = db["database"]  # Replace with your collection
 
 # Initialize the PiCamera
 camera = PiCamera()
@@ -51,11 +51,13 @@ def distance():
     distance = (TimeElapsed * 34300) / 2
     return distance
 
-# Capture frames continuously
-for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port=True):
-    # Extract the array from the frame
-    frame_image = frame.array
+def convert_image_to_binary(image_path):
+    with open(image_path, "rb") as image_file:
+        binary_data = image_file.read()
+    return binary_data
 
+# Function to capture registration number from camera and convert image data to binary
+def capture_and_convert_to_binary(frame_image):
     # Convert the frame to grayscale
     gray_frame = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
     gray_frame = cv2.bilateralFilter(gray_frame, 11, 17, 17)  # Blur to reduce noise
@@ -94,18 +96,37 @@ for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port
         detected_number = pytesseract.image_to_string(cropped_image, config='--psm 11')
         print("Detected Number is:", detected_number)
 
-        # Get the distance from the ultrasonic sensor
-        dist = distance()
-        print("Measured Distance = %.1f cm" % dist)
+        # Return dummy binary data for now, replace with actual image capture logic
+        return b'\x01\x02\x03\x04'
 
+    return None
+
+# Storing the captured binary data in MongoDB
+def store_in_mongodb(binary_data, detected_number, distance_value):
+    data = {
+        "camera_id": camera_id,
+        "ultrasonic_sensor_id": ultrasonic_sensor_id,
+        "detected_number": detected_number,
+        "distance": distance_value,
+        "binary_data": binary_data
+    }
+    collection.insert_one(data)
+
+# Capture frames continuously
+for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port=True):
+    # Extract the array from the frame
+    frame_image = frame.array
+
+    # Get the distance from the ultrasonic sensor
+    dist = distance()
+    print("Measured Distance = %.1f cm" % dist)
+
+    # Capture and convert image data to binary
+    binary_data = capture_and_convert_to_binary(frame_image)
+
+    if binary_data is not None:
         # Store the detected number, camera ID, and sensor data in MongoDB
-        data = {
-            "camera_id": camera_id,
-            "ultrasonic_sensor_id": ultrasonic_sensor_id,
-            "detected_number": detected_number,
-            "distance": dist
-        }
-        collection.insert_one(data)
+        store_in_mongodb(binary_data, detected_number, dist)
 
     # Display the processed frame
     cv2.imshow("Frame", frame_image)
@@ -122,9 +143,6 @@ for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port
 
 # Close MongoDB connection
 client.close()
-
-# Clean up GPIO
-GPIO.cleanup()
 
 # Close all windows
 cv2.destroyAllWindows()
