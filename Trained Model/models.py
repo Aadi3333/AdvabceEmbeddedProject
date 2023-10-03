@@ -47,7 +47,7 @@ def update_booking_completion(sender, instance, created, **kwargs):
 
 def get_ultrasonic_sensor_value():
     # Replace this function with the logic to read the ultrasonic sensor value from MongoDB
-    connection_string = "mongodb+srv://aadi333:Aadimahala70154@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
+    connection_string = "mongodb+srv://username:password@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
     client = pymongo.MongoClient(connection_string)
     db = client["AdvanceParking"]  # Replace with your actual database name
     collection = db["database"]  # Replace with your actual collection name

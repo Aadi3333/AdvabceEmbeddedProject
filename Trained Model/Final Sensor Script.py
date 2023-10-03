@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 import time
 
 # MongoDB connection URI
-mongo_uri = f"mongodb+srv://aadi333:Aadimahala70154@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
+mongo_uri = f"mongodb+srv://username:password@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
 
 # Connect to MongoDB
 client = pymongo.MongoClient(mongo_uri)

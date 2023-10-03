@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 import time
 from datetime import datetime  # Import the datetime module
 
-connection_string = f"mongodb+srv://aadi333:Aadimahala70154@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
+connection_string = f"mongodb+srv://username:password@cluster0.wstqz17.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(connection_string)
 db = client["mydatabase"]
 col = db["mycollection"]
