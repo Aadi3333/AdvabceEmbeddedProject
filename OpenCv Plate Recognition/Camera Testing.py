@@ -2,7 +2,6 @@ import cv2
 import imutils
 import numpy as np
 import pytesseract
-from PIL import Image
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
@@ -19,12 +18,9 @@ for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port
     
     # Display the frame
     cv2.imshow("Frame", frame_image)
-    
+        
     # Wait for a key press
     key = cv2.waitKey(1) & 0xFF
-    
-    # Clear the stream for the next frame
-    raw_capture.truncate(0)
     
     # Check if 's' key is pressed to capture and process the image
     if key == ord("s"):
@@ -78,8 +74,8 @@ for frame in camera.capture_continuous(raw_capture, format="bgr", use_video_port
         # Add your email sending logic here
         
         # Display the processed frame and cropped image
-        cv2.imshow("Frame", frame_image)
-        cv2.imshow('Cropped', cropped_image)
+        cv2.imshow("Processed Frame", frame_image)
+        cv2.imshow('Cropped Image', cropped_image)
         cv2.waitKey(0)
         break
 
